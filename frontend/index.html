@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЕАИС - Оценка мер ТТП</title>
+    <style>
+        .charts {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #d5dbdb;
+            border-radius: 4px;
+        }
+        .charts img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+        }
+        .metrics {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #d5dbdb;
+            border-radius: 4px;
+        }
+        .metrics pre {
+            background-color: #bdc3c7;
+            padding: 5px;
+            border-radius: 3px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .auth-btn {
+            background-color: #27ae60;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        .auth-btn:hover {
+            background-color: #219653;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            display: none;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        /* Стили для блока авторизации */
+        .auth-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+        }
+        .auth-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+        .download-btn {
+            margin-top: 15px;
+            background-color: #9b59b6;
+            padding: 8px 16px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .download-btn:hover {
+            background-color: #8e44ad;
+        }
+        .download-icon {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка сайта -->
+        <div class="header">
+            <div class="logo">Pioner</div>
+            <div class="auth-section">
+                <button id="authBtn" class="auth-btn">Войти</button>
+            </div>
+        </div>
+
+        <!-- Форма для ввода данных -->
+        <h1>ЕАИС: Оценка мер ТТП</h1>
+        <label for="productName">Наименование товара:</label>
+        <input type="text" id="productName" placeholder="Введите наименование товара" required>
+
+        <label for="tnvedCode">Код ТН ВЭД (6 или 10 знаков):</label>
+        <input type="text" id="tnvedCode" placeholder="Например: 123456 или 1234567890" required>
+
+        <button id="evaluateBtn">Оценить меры ТТП</button>
+
+        <!-- Блок для отображения результата -->
+        <div id="result" class="result">
+            <h3>Рекомендуемая мера ТТП:</h3>
+            <p id="measure"></p>
+            <h3>Обоснование:</h3>
+            <p id="reason"></p>
+
+            <!-- --- БЛОК ДЛЯ МЕТРИК --- -->
+            <div id="metrics" class="metrics" style="display:none;">
+                <!-- Содержимое будет добавлено script.js -->
+            </div>
+            <!-- --- -->
+
+            <!-- --- БЛОК ДЛЯ ГРАФИКОВ --- -->
+            <div id="charts" class="charts" style="display:none;">
+                <h4>Графики анализа:</h4>
+                <div id="charts-container"></div>
+            </div>
+            <!-- --- -->
+
+            <!-- --- КНОПКА ЗАГРУЗКИ ДОКУМЕНТА --- -->
+            <button id="downloadReportBtn" class="download-btn" style="display:none;">
+                <span class="download-icon">📥</span> Скачать отчёт
+            </button>
+            <!-- --- -->
+        </div>
+
+        <!-- Блок для ошибок -->
+        <div id="error" class="error"></div>
+    </div>
+
+    <!-- Модальное окно авторизации -->
+    <div id="authModalOverlay" class="auth-modal-overlay"></div>
+    <div id="authModal" class="auth-modal">
+        <h3>Авторизация</h3>
+        <label for="username">Логин:</label>
+        <input type="text" id="username" placeholder="Введите логин" required>
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" placeholder="Введите пароль" required>
+        <button id="loginBtn">Войти</button>
+        <button id="logoutBtn" style="display:none;">Выйти</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
